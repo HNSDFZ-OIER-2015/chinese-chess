@@ -35,3 +35,6 @@ __pycache__/*
 
 # Clang temporary files
 *.plist
+
+# Sublime
+*.sublime-workspace
