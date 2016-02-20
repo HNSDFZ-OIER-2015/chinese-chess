@@ -3,17 +3,42 @@
 //
 
 #include <vector>
+#include <queue>
+#include <memory>
+#include <utility>
 
 #include "Events.hpp"
+
+#ifndef BACKEND_FRONTEND_API_HPP_
+#define BACKEND_FRONTEND_API_HPP_
+
+///////////////////////////////////
+// Initialization & finalization //
+///////////////////////////////////
 
 void Initialize();
 void Terminate();
 
-auto HasEvents() -> bool;
-auto PollEvent() -> IEvent *;
+//////////////////////
+// Event processing //
+//////////////////////
 
-template <typename... Args>
-void PushEvent(const EventType type, const Args &... args);
+typedef std::unique_ptr<IEvent> EventPointer;
+
+extern std::queue<EventPointer> event_queue;
+
+auto HasEvents() -> bool;
+auto PollEvent() -> EventPointer;
+
+template <typename TEvent, typename... Args>
+void PushEvent(const Args &... args) {
+    EventPointer ptr = EventPointer(new TEvent(args...));
+    event_queue.push(std::move(ptr));
+}
+
+//////////////////////
+// Game controlling //
+//////////////////////
 
 enum class ChessType {
     None,  // TODO: fill here
@@ -33,3 +58,5 @@ void SetChess(const int x, const int y, const ChessType chess);
 void MoveChess(const int from_x, const int from_y, const int to_x,
                const int to_y);
 auto GetPlacable(const int x, const int y) -> std::vector<Point>;
+
+#endif  // BACKEND_FRONTEND_API_HPP_
