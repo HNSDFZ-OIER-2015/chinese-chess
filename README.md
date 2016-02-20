@@ -1,2 +1,2 @@
 # chinese-chess
-Chinese chess game.
+Chinese chess game at Python frontend branch.
