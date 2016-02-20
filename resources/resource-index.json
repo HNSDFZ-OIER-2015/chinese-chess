@@ -1,0 +1,17 @@
+{
+    "chessboard": "chessboard.jpg",
+    "red_king": "red-king.png",
+    "red_guard": "red-guard.png",
+    "red_bishop": "red-bishop.png",
+    "red_knight": "red-knight.png",
+    "red_rook": "red-rook.png",
+    "red_cannon": "red-cannon.png",
+    "red_pawn": "red-pawn.png",
+    "black_king": "black-king.png",
+    "black_guard": "black-guard.png",
+    "black_bishop": "black-bishop.png",
+    "black_knight": "black-knight.png",
+    "black_rook": "black-rook.png",
+    "black_cannon": "black-cannon.png",
+    "black_pawn": "black-pawn.png"
+}
