@@ -14,7 +14,6 @@ extern std::queue<MoveEvent> messages;
 
 void Request();
 void PushMoveEvent(int from_x, int from_y, int to_x, int to_y);
-auto PullEvent() -> MoveEvent;
 
 extern "C" {
 bool is_requested();

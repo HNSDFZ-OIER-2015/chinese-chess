@@ -2,6 +2,11 @@
 // Copyright 2016 HNSDFZ-OIER
 //
 
+////////////////////////////////////////////
+// WARNING: This file be compiled into    //
+//          **a single dynamic library**. //
+////////////////////////////////////////////
+
 #include <cassert>
 
 #include "PythonAPI.hpp"
@@ -19,13 +24,6 @@ void Request() {
 
 void PushMoveEvent(int from_x, int from_y, int to_x, int to_y) {
     events.push(MoveEvent(from_x, from_y, to_x, to_y));
-}
-
-auto PullEvent() -> MoveEvent {
-    MoveEvent event = events.front();
-    events.pop();
-
-    return event;
 }
 
 bool is_requested() {
