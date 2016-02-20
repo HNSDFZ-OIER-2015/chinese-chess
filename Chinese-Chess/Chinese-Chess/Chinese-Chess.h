@@ -67,7 +67,7 @@ void LoadResource() {
 	ChessRender->CreateSolidBrush(&BoxFillBrush);
 }
 void LoadMsg() {
-
+	
 	SetMap(1, 1, CHESS_ROOK, Black);
 	SetMap(2, 1, CHESS_KNIGHT, Black);
 	SetMap(3, 1, CHESS_BISHOP, Black);
