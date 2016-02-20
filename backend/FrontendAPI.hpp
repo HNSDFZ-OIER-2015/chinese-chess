@@ -23,18 +23,11 @@ void Terminate();
 // Event processing //
 //////////////////////
 
-typedef std::unique_ptr<IEvent> EventPointer;
-
-extern std::queue<EventPointer> event_queue;
-
 auto HasEvents() -> bool;
-auto PollEvent() -> EventPointer;
+auto PollEvent() -> MoveEvent;
 
-template <typename TEvent, typename... Args>
-void PushEvent(const Args &... args) {
-    EventPointer ptr = EventPointer(new TEvent(args...));
-    event_queue.push(std::move(ptr));
-}
+void PushRequestEvent();
+void PushMoveEvent(int from_x, int from_y, int to_x, int to_y);
 
 //////////////////////
 // Game controlling //

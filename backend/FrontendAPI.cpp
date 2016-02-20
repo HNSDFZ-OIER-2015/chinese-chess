@@ -5,8 +5,6 @@
 #include "FrontendAPI.hpp"
 #include "PythonAPI.hpp"
 
-std::queue<EventPointer> event_queue;
-
 static ChessDataType data;
 
 void Initialize() {
@@ -21,14 +19,22 @@ void Terminate() {
 }
 
 auto HasEvents() -> bool {
-    return not event_queue.empty();
+    return not events.empty();
 }
 
-auto PollEvent() -> EventPointer {
-    EventPointer ptr = std::move(event_queue.front());
-    event_queue.pop();
+auto PollEvent() -> MoveEvent {
+    MoveEvent event = events.front();
+    events.pop();
 
-    return std::move(ptr);
+    return event;
+}
+
+void PushRequestEvent() {
+    Request();
+}
+
+void PushMoveEvent(int from_x, int from_y, int to_x, int to_y) {
+    messages.push(MoveEvent(from_x, from_y, to_x, to_y));
 }
 
 auto GetChessData() -> ChessDataType & {
