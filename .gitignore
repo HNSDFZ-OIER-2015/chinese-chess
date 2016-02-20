@@ -26,3 +26,15 @@
 *.exe
 *.out
 *.app
+
+# Python
+__pycache__/*
+*.pyx
+*.pyo
+*.pyc
+
+# Clang temporary files
+*.plist
+
+# Sublime
+*.sublime-workspace
