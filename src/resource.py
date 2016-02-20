@@ -52,3 +52,16 @@ class BoardLayout(object):
 
     def get_position(self, i, j):
         return self._map[(i, j)]
+
+    def get_index(self, x, y, width, height):
+        for key, value in self._map:
+            cx, cy = value
+            left = cx - width / 2
+            right = cx + width / 2
+            top = cy - height / 2
+            bottom = cy + height / 2
+
+            if left <= x and x <= right and top <= y and y <=  bottom:
+                return key
+
+        return None
