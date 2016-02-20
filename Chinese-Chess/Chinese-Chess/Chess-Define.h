@@ -2,8 +2,14 @@
 #define ChessPicesNum 7
 const int Red = 1;
 const int Black = 0;
-const float ChessSizeWidth = 107;
-const float ChessSizeHeight = 102;
+const float ChessSizeWidth = 76.0f;
+const float ChessSizeHeight = 76.0f;
+const float ChessSizeWidthHalf = 38.0f;
+const float ChessSizeHeightHalf = 38.0f;
+const float BoxSizeWitdh = 76.0f;
+const float BoxSizeHeight = 76.0f;
+const float BoxSizeWidthHalf = 38.0f;
+const float BoxSizeHeightHalf = 38.0f;
 typedef enum {
 	CHESS_KING = 0, //Ë§
 	CHESS_ROOK = 1, //³µ
@@ -13,6 +19,12 @@ typedef enum {
 	CHESS_CANNON = 5, //ÅÚ
 	CHESS_PAWN = 6 //±ø
 }CHESS_KIND;
+typedef enum {
+	GAME_STATE_RED_BEGIN = 0,
+	GAME_STATE_RED_GET = 1,
+	GAME_STATE_BLACK_BEGIN = 2,
+	GAME_STATE_BLACK_GET
+}GAME_STATE;
 struct Position {
 	int x, y;
 	static Position POS(int x, int y) {
@@ -25,5 +37,7 @@ struct Position {
 struct Chess_State {
 	BOOL Chess;
 	BOOL Color;
+	BOOL MouseIn;
+	BOOL MouseDown;
 	CHESS_KIND Kind;
 };

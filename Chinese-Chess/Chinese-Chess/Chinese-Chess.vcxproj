@@ -165,7 +165,22 @@
     <ResourceCompile Include="Chinese-Chess.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Blackbishop.png" />
+    <Image Include="BlackCannon.png" />
+    <Image Include="BlackGuard.png" />
+    <Image Include="BlackKing.png" />
+    <Image Include="BlackKnight.png" />
+    <Image Include="BlackPawn.png" />
+    <Image Include="BlackRook.png" />
+    <Image Include="ChessBoard.jpg" />
     <Image Include="Chinese-Chess.ico" />
+    <Image Include="Redbishop.png" />
+    <Image Include="RedCannon.png" />
+    <Image Include="RedGuard.png" />
+    <Image Include="RedKing.png" />
+    <Image Include="RedKnight.png" />
+    <Image Include="RedPawn.png" />
+    <Image Include="RedRook.png" />
     <Image Include="small.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -39,7 +39,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CHINESECHESS));
 
 	MSG msg = { 0 };
-
 	Init(ChessRender, Hwnd, Width, Height);//初始化渲染
 	//Msg
 											 // 主消息循环: 
@@ -129,8 +128,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	POINT MousePos;
 	switch (message)
 	{
+	case WM_MOUSEMOVE:
+		GetCursorPos(&MousePos);
+		ScreenToClient(Hwnd, &MousePos);
+		DealMouseMove(MousePos.x, MousePos.y);
+		break;
+	case WM_LBUTTONDOWN:
+		GetCursorPos(&MousePos);
+		ScreenToClient(Hwnd, &MousePos);
+		DealMouseDown(MousePos.x, MousePos.y);
+		break;
 	case WM_SIZE:
 		if (ChessRender)
 			ChessRender->Resize(Width, Height);

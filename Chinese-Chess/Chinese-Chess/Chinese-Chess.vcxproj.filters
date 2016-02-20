@@ -54,5 +54,50 @@
     <Image Include="Chinese-Chess.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="Blackbishop.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="BlackCannon.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="BlackGuard.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="BlackKing.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="BlackKnight.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="BlackPawn.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="BlackRook.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="ChessBoard.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Redbishop.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="RedCannon.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="RedGuard.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="RedKing.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="RedKnight.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="RedPawn.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="RedRook.png">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>
