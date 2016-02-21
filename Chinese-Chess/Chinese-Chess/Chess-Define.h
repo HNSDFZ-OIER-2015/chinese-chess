@@ -2,6 +2,9 @@
 #define ChessPicesNum 7
 const int Red = 1;
 const int Black = 0;
+const int Empty = 2;
+const int Alone = 1;
+const int Together = 0;
 const float ChessSizeWidth = 76.0f;
 const float ChessSizeHeight = 76.0f;
 const float ChessSizeWidthHalf = 38.0f;
