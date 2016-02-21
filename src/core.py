@@ -72,7 +72,12 @@ def to_chess_name(chess):
     return reverse_name_map[chess]
 
 def get_chess_color(chess):
-    return (chess / 100) * 100;
+    if chess == CHESS_NONE:
+        return CHESS_NONE
+    elif CHESS_RED <= chess and chess <= CHESS_RED_PAWN:
+        return CHESS_RED
+    elif CHESS_BLACK <= chess and chess <= CHESS_BLACK_PAWN:
+        return CHESS_BLACK
 
 class PositionSearcher(object):
     """A search engine for correct chess placing"""
@@ -93,9 +98,17 @@ class NonePositionSearcher(object):
 
         result = set()
 
-        for i, line in enumerate(board.data):
-            for j, chess in enumerate(line):
-                if chess == CHESS_NONE:
+        enemy = None
+        if get_chess_color(board.get_chess(x, y)) == CHESS_RED:
+            enemy = CHESS_BLACK
+        else:
+            enemy = CHESS_RED
+
+        for i in range(1, 11):
+            for j in range(1, 10):
+                chess = board.get_chess(i, j)
+
+                if chess == CHESS_NONE or get_chess_color(chess) == enemy:
                     result.add((i, j))
 
         return result
@@ -133,10 +146,8 @@ class Board(object):
         return self.data[x - 1][y - 1]
 
     def move_chess(self, from_x, from_y, to_x, to_y):
-        set_chess(to_x, to_y, get_chess(from_x, from_y))
-        set_chess(from_x, from_y, CHESS_NONE)
+        self.set_chess(to_x, to_y, self.get_chess(from_x, from_y))
+        self.set_chess(from_x, from_y, CHESS_NONE)
 
     def compute_placable(self, x, y):
-        result = self.searcher.search(self, x, y)
-        result = map(lambda point: (point[0] - 1, point[1] - 1), result)
-        return result
+        return self.searcher.search(self, x, y)
