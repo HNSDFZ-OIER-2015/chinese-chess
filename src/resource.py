@@ -17,6 +17,11 @@ RESOURCE_CONFIG_FILE = "resources/resource-config.json"
 resources = {}
 config = {}
 
+def get(key):
+    global resources
+
+    return resources[key]
+
 def load_resources():
     global RESOURCE_DIRECTORY
     global RESOURCE_INDEX_FILE
@@ -47,14 +52,16 @@ class BoardLayout(object):
 
         for key, value in config.items():
             x, y = map(int, key.split(","))
-            rx, ry = value
-            self._map[(x, y)] = (rx, ry)
+            self._map[(x, y)] = value
 
     def get_position(self, i, j):
         return self._map[(i, j)]
 
     def get_index(self, x, y, width, height):
-        for key, value in self._map:
+        for key, value in self._map.items():
+            if len(value) == 0:
+                continue
+
             cx, cy = value
             left = cx - width / 2
             right = cx + width / 2

@@ -4,23 +4,75 @@
 
 CHESS_NONE = 0
 
-CHESS_RED = -1
-CHESS_RED_KING = 1
-CHESS_RED_GUARD = 2
-CHESS_RED_BISHOP = 3
-CHESS_RED_KNIGHT = 4
-CHESS_RED_ROOK = 5
-CHESS_RED_CANNON = 6
-CHESS_RED_PAWN = 7
+CHESS_RED = 100
+CHESS_RED_KING = 101
+CHESS_RED_GUARD = 102
+CHESS_RED_BISHOP = 103
+CHESS_RED_KNIGHT = 104
+CHESS_RED_ROOK = 105
+CHESS_RED_CANNON = 106
+CHESS_RED_PAWN = 107
 
-CHESS_BLACK = -2
-CHESS_BLACK_KING = 8
-CHESS_BLACK_GUARD = 9
-CHESS_BLACK_BISHOP = 10
-CHESS_BLACK_KNIGHT = 11
-CHESS_BLACK_ROOK = 12
-CHESS_BLACK_CANNON = 13
-CHESS_BLACK_PAWN = 14
+CHESS_BLACK = 200
+CHESS_BLACK_KING = 201
+CHESS_BLACK_GUARD = 202
+CHESS_BLACK_BISHOP = 203
+CHESS_BLACK_KNIGHT = 204
+CHESS_BLACK_ROOK = 205
+CHESS_BLACK_CANNON = 206
+CHESS_BLACK_PAWN = 207
+
+name_map = {
+    "": CHESS_NONE,
+
+    "red_king": CHESS_RED_KING,
+    "red_guard": CHESS_RED_GUARD,
+    "red_bishop": CHESS_RED_BISHOP,
+    "red_knight": CHESS_RED_KNIGHT,
+    "red_rook": CHESS_RED_ROOK,
+    "red_cannon": CHESS_RED_CANNON,
+    "red_pawn": CHESS_RED_PAWN,
+
+    "black_king": CHESS_BLACK_KING,
+    "black_guard": CHESS_BLACK_GUARD,
+    "black_bishop": CHESS_BLACK_BISHOP,
+    "black_knight": CHESS_BLACK_KNIGHT,
+    "black_rook": CHESS_BLACK_ROOK,
+    "black_cannon": CHESS_BLACK_CANNON,
+    "black_pawn": CHESS_BLACK_PAWN
+}
+
+reverse_name_map = {
+    CHESS_NONE: "",
+
+    CHESS_RED_KING: "red_king",
+    CHESS_RED_GUARD: "red_guard",
+    CHESS_RED_BISHOP: "red_bishop",
+    CHESS_RED_KNIGHT: "red_knight",
+    CHESS_RED_ROOK: "red_rook",
+    CHESS_RED_CANNON: "red_cannon",
+    CHESS_RED_PAWN: "red_pawn",
+
+    CHESS_BLACK_KING: "black_king",
+    CHESS_BLACK_GUARD: "black_guard",
+    CHESS_BLACK_BISHOP: "black_bishop",
+    CHESS_BLACK_KNIGHT: "black_knight",
+    CHESS_BLACK_ROOK: "black_rook",
+    CHESS_BLACK_CANNON: "black_cannon",
+    CHESS_BLACK_PAWN: "black_pawn"
+}
+
+
+def to_chess(name):
+    name = name.strip().lower()
+    
+    return name_map[name]
+
+def to_chess_name(chess):
+    return reverse_name_map[chess]
+
+def get_chess_color(chess):
+    return (chess / 100) * 100;
 
 class PositionSearcher(object):
     """A search engine for correct chess placing"""
@@ -30,18 +82,49 @@ class PositionSearcher(object):
     def search(self, board, x, y):
         pass
 
+class NonePositionSearcher(object):
+    """Search for positions where no chess placed"""
+    def __init__(self):
+        super(NonePositionSearcher, self).__init__()
+
+    def search(self, board, x, y):
+        if board.get_chess(x, y) == CHESS_NONE:
+            return set()
+
+        result = set()
+
+        for i, line in enumerate(board.data):
+            for j, chess in enumerate(line):
+                if chess == CHESS_NONE:
+                    result.add((i, j))
+
+        return result
+
 class Board(object):
     """Respect a board to store game data"""
-    def __init__(self, current=CHESS_RED):
+    def __init__(self, chess, current=CHESS_RED, searcher=PositionSearcher()):
         super(Board, self).__init__()
         self.current = current
         self.data = []
-        self.searcher = PositionSearcher()
+        self.searcher = searcher
+
+        if current == CHESS_RED:
+            current = "red"
+        elif current == CHESS_BLACK:
+            current = "black"
+        else:
+            raise ValueError("Invalid parameter: current")
+
+        layout = {}
+        for key, value in chess[current].items():
+            i, j = map(int, key.split(","))
+            value = to_chess(value)
+            layout[(i, j)] = value
 
         for i in range(0, 10):
             self.data.append([])
             for j in range(0, 9):
-                self.data[-1].append(CHESS_NONE)
+                self.data[-1].append(layout[(i + 1, j + 1)])
 
     def set_chess(self, x, y, chess):
         self.data[x - 1][y - 1] = chess
@@ -54,4 +137,6 @@ class Board(object):
         set_chess(from_x, from_y, CHESS_NONE)
 
     def compute_placable(self, x, y):
-        return self.searcher.search(self, x, y)
+        result = self.searcher.search(self, x, y)
+        result = map(lambda point: (point[0] - 1, point[1] - 1), result)
+        return result

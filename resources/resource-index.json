@@ -13,5 +13,7 @@
     "black_knight": "black-knight.png",
     "black_rook": "black-rook.png",
     "black_cannon": "black-cannon.png",
-    "black_pawn": "black-pawn.png"
+    "black_pawn": "black-pawn.png",
+    "normal_select": "normal_select.png",
+    "attack_select": "attack_select.png"
 }
