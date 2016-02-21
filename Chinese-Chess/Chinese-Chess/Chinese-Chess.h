@@ -772,27 +772,21 @@ void GetPawnRoad(int PosX, int PosY, BOOL Color, vector<Position> &Road) {
 void GetChessPicesRoad(CHESS_KIND Kind, int PosX, int PosY, BOOL Color, vector<Position> &Road) {
 	if (Kind == CHESS_KING) {
 		GetKingRoad(PosX, PosY, Color, Road);
-		return;
 	}
 	if (Kind == CHESS_GUARD) {
 		GetGuardRoad(PosX, PosY, Color, Road);
-		return;
 	}
 	if (Kind == CHESS_BISHOP) {
 		GetBishopRoad(PosX, PosY, Color, Road);
-		return;
 	}
 	if (Kind == CHESS_KNIGHT) {
 		GetKnightRoad(PosX, PosY, Color, Road);
-		return;
 	}
 	if (Kind == CHESS_ROOK) {
 		GetRookRoad(PosX, PosY, Color, Road);
-		return;
 	}
 	if (Kind == CHESS_CANNON) {
 		GetCannonRoad(PosX, PosY, Color, Road);
-		return;
 	}
 	if (Kind == CHESS_PAWN) {
 		GetPawnRoad(PosX, PosY, Color, Road);
@@ -808,6 +802,43 @@ void GetChessPicesRoad(CHESS_KIND Kind, int PosX, int PosY, BOOL Color, vector<P
 	}
 	if (KingNum == 2 && ChessPiceNum == 3) {
 		Road.clear();
+	}
+	if (Kind == CHESS_KING) {
+		vector<Position> NewRoad;
+		BOOL Meetking = FALSE;
+		BOOL CanGet = TRUE;
+		int Size = Road.size();
+		int NewSize = 0;
+		NewRoad.resize(Size);
+		for (int i = 0; i <= Size - 1; i++) {
+			CanGet = TRUE;
+			if (MainView == Color) {	
+				for (int j = Road[i].y; j >= 1; j--) {
+					if (Map[Road[i].x][j].Chess == TRUE) {
+						if (Map[Road[i].x][j].Kind == CHESS_KING)
+							CanGet = FALSE;
+						break;
+					}
+				}
+			}
+			if (MainView != Color) {
+				for (int j = Road[i].y; j <= 10; j++) {
+					if (Map[Road[i].x][j].Chess == TRUE) {
+						if (Map[Road[i].x][j].Kind == CHESS_KING)
+							CanGet = FALSE;
+						break;
+					}
+				}
+			}
+			if (CanGet == TRUE || PosX==Road[i].x) {
+				NewRoad.push_back(Road[i]);
+			}
+		}
+		Road.clear();
+		NewSize = NewRoad.size();
+		for (int i = 0; i <= NewSize - 1; i++) {
+			Road.push_back(NewRoad[i]);
+		}
 	}
 }
 //Rotation MainView
