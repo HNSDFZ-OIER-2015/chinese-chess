@@ -41,8 +41,8 @@ class Game(object):
         self.board_layout = resource.BoardLayout(resource.config["board_layout"])
         self.board = core.Board(
             resource.config["chess_layout"],
-            current=core.CHESS_RED,
-            searcher=core.NonePositionSearcher()
+            layout_name=core.CHESS_RED,
+            searcher=core.RealSearchEngine()
         )
 
         self.scan_board()
@@ -56,6 +56,18 @@ class Game(object):
         self.current_block.x = -1000
         self.current_block.y = -1000
 
+        self.selected_block1 = graphics.BlockEnitiy(
+            self.window, Sprite(resource.get("selected"))
+        )
+        self.selected_block1.x = -1000
+        self.selected_block1.y = -1000
+
+        self.selected_block2 = graphics.BlockEnitiy(
+            self.window, Sprite(resource.get("selected"))
+        )
+        self.selected_block2.x = -1000
+        self.selected_block2.y = -1000
+
         self.selected_x = 0
         self.selected_y = 0
 
@@ -67,9 +79,12 @@ class Game(object):
         )
 
         if not indexes is None:
+            self.current_block.visible = True
             i, j = indexes
             position = self.board_layout.get_position(i, j)
             self.current_block.x, self.current_block.y = position
+        else:
+            self.current_block.visible = False
 
     def update_candidates_graphics(self):
         for position in self.placable:
@@ -161,12 +176,25 @@ class Game(object):
             if not (i, j) in self.placable:
                 self.selected_x = i
                 self.selected_y = j
+
+                self.selected_block1.visible = True
+                self.selected_block2.visible = False
+                x, y = self.board_layout.get_position(i, j)
+                self.selected_block1.x = x
+                self.selected_block1.y = y
+
                 self.update_candidates(i, j)
             else:
+                self.selected_block2.visible = True
+                x, y = self.board_layout.get_position(i, j)
+                self.selected_block2.x = x
+                self.selected_block2.y = y
+
                 self.board.move_chess(
                     self.selected_x, self.selected_y,
                     i, j
                 )
+                self.board.switch_current()
                 self.clear_candidates()
                 self.scan_board()
 
@@ -192,6 +220,8 @@ class Game(object):
             candidate.render()
 
         self.current_block.render()
+        self.selected_block1.render()
+        self.selected_block2.render()
         self.window.present()
 
     def run(self):

@@ -87,7 +87,7 @@ class PositionSearcher(object):
     def search(self, board, x, y):
         pass
 
-class NonePositionSearcher(object):
+class NonePositionSearcher(PositionSearcher):
     """Search for positions where no chess placed"""
     def __init__(self):
         super(NonePositionSearcher, self).__init__()
@@ -113,23 +113,74 @@ class NonePositionSearcher(object):
 
         return result
 
+class RealSearchEngine(PositionSearcher):
+    """Real position search engine"""
+    def __init__(self):
+        super(RealSearchEngine, self).__init__()
+
+        self.searcher_map = {
+            CHESS_RED_KING: RealSearchEngine.search_king,
+            CHESS_RED_GUARD: RealSearchEngine.search_guard,
+            CHESS_RED_BISHOP: RealSearchEngine.search_bishop,
+            CHESS_RED_KNIGHT: RealSearchEngine.search_knight,
+            CHESS_RED_ROOK: RealSearchEngine.search_rook,
+            CHESS_RED_CANNON: RealSearchEngine.search_cannon,
+            CHESS_RED_PAWN: RealSearchEngine.search_pawn
+        }
+    
+    def search_king(self, board, x, y):
+        return set()
+
+    def search_guard(self, board, x, y):
+        return set()
+
+    def search_bishop(self, board, x, y):
+        return set()
+
+    def search_knight(self, board, x, y):
+        return set()
+
+    def search_rook(self, board, x, y):
+        return set()
+
+    def search_cannon(self, board, x, y):
+        return set()
+
+    def search_pawn(self, board, x, y):
+        return set()
+
+    def search(self, board, x, y):
+        chess = board.get_chess(x, y)
+        color = get_chess_color(chess)
+
+        if color != board.current:
+            return set()
+
+        if color == CHESS_BLACK:
+            chess -= 100
+
+        return self.searcher_map[chess](
+            self, board, x, y
+        )
+
 class Board(object):
     """Respect a board to store game data"""
-    def __init__(self, chess, current=CHESS_RED, searcher=PositionSearcher()):
+    def __init__(self, chess, layout_name=CHESS_RED, searcher=PositionSearcher()):
         super(Board, self).__init__()
-        self.current = current
+        self.layout_name = layout_name
+        self.current = CHESS_RED
         self.data = []
         self.searcher = searcher
 
-        if current == CHESS_RED:
-            current = "red"
-        elif current == CHESS_BLACK:
-            current = "black"
+        if layout_name == CHESS_RED:
+            layout_name = "red"
+        elif layout_name == CHESS_BLACK:
+            layout_name = "black"
         else:
-            raise ValueError("Invalid parameter: current")
+            raise ValueError("Invalid parameter: layout_name")
 
         layout = {}
-        for key, value in chess[current].items():
+        for key, value in chess[layout_name].items():
             i, j = map(int, key.split(","))
             value = to_chess(value)
             layout[(i, j)] = value
@@ -148,6 +199,12 @@ class Board(object):
     def move_chess(self, from_x, from_y, to_x, to_y):
         self.set_chess(to_x, to_y, self.get_chess(from_x, from_y))
         self.set_chess(from_x, from_y, CHESS_NONE)
+
+    def switch_current(self):
+        if self.current == CHESS_RED:
+            self.current = CHESS_BLACK
+        else:
+            self.current = CHESS_RED
 
     def compute_placable(self, x, y):
         return self.searcher.search(self, x, y)
