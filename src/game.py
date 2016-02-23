@@ -71,6 +71,8 @@ class Game(object):
         self.selected_x = 0
         self.selected_y = 0
 
+        self.disabled = False
+
     def update_current_block(self, x, y):
         indexes = self.board_layout.get_index(
             x, y,
@@ -147,6 +149,81 @@ class Game(object):
 
         return None
 
+    def move(self, from_x, from_y, to_x, to_y):
+        origin = self.board.get_chess(
+            to_x, to_y
+        )
+        self.board.move_chess(
+            from_x, from_y,
+            to_x, to_y
+        )
+
+        kx, ky = 0, 0
+
+        if self.board.current == core.CHESS_RED:
+            kx, ky = self.find_board(core.CHESS_RED_KING)
+        else:
+            kx, ky = self.find_board(core.CHESS_BLACK_KING)
+
+        if self.board.is_dangerous(kx, ky):
+            if self.board.current == core.CHESS_RED:
+                print("(warn) Red king is in danger")
+            else:
+                print("(warn) Black king is in danger")     
+
+            # No hard changes
+            # self.board.move_chess(
+            #     to_x, to_y,
+            #     from_x, from_y
+            # )
+            # self.board.set_chess(
+            #     to_x, to_y, origin
+            # )
+            # self.clear_candidates()
+            # self.scan_board()
+            # return
+
+        self.selected_block2.visible = True
+        x, y = self.board_layout.get_position(to_x, to_y)
+        self.selected_block2.x = x
+        self.selected_block2.y = y
+
+        self.board.switch_current()
+        self.clear_candidates()
+        self.scan_board()
+
+        if origin == core.CHESS_RED_KING or origin == core.CHESS_BLACK_KING:
+            print("(info) Game finished")
+
+            if origin == core.CHESS_RED_KING:
+                print("(info) Black is winner")
+            else:
+                print("(info) Red is winner")
+
+            self.disabled = True
+
+    ##################
+    # Networking     #
+    ##################
+
+    def setup_server(self, address, port):
+        pass
+
+    def setup_client(self, address, port):
+        # Reset chess board layout
+        self.board = core.Board(
+            resource.config["chess_layout"],
+            layout_name=core.CHESS_BLACK,
+            searcher=core.RealSearchEngine()
+        )
+        self.scan_board()
+
+    def server(self):
+        pass
+
+    def client(self):
+        pass
+
     ##################
     # Event handling #
     ##################
@@ -160,6 +237,9 @@ class Game(object):
         )
 
     def on_mouse_click(sender, event, self):
+        if self.disabled:
+            return
+
         if event.released:
             if event.button == Mouse.RIGHT or event.button == Mouse.MIDDLE:
                 self.clear_candidates()
@@ -193,29 +273,10 @@ class Game(object):
 
                 self.update_candidates(i, j)
             else:
-                kx, ky = 0, 0
-
-                if self.board.current == core.CHESS_RED:
-                    kx, ky = self.find_board(core.CHESS_RED_KING)
-                else:
-                    kx, ky = self.find_board(core.CHESS_BLACK_KING)
-
-                if self.board.is_dangerous(kx, ky):
-                    print("Your king is in dangerous")
-                    return
-
-                self.selected_block2.visible = True
-                x, y = self.board_layout.get_position(i, j)
-                self.selected_block2.x = x
-                self.selected_block2.y = y
-
-                self.board.move_chess(
+                self.move(
                     self.selected_x, self.selected_y,
                     i, j
                 )
-                self.board.switch_current()
-                self.clear_candidates()
-                self.scan_board()
 
     ##################
     # Updating       #

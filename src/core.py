@@ -403,8 +403,16 @@ class Board(object):
     def is_dangerous(self, x, y):
         chess = self.get_chess(x, y)
         color = get_chess_color(chess)
+
+        enemy = CHESS_NONE
+        if color == CHESS_RED:
+            enemy = CHESS_BLACK
+        else:
+            enemy = CHESS_RED
+
         placable = set()
 
+        self.current = enemy
         for i in range(1, 11):
             for j in range(1, 10):
                 current = self.get_chess(i, j)
@@ -412,6 +420,7 @@ class Board(object):
 
                 if current != CHESS_NONE and current_color != color:
                     placable = placable | self.compute_placable(i, j)
+        self.current = color
 
         if chess == CHESS_RED_KING or chess == CHESS_BLACK_KING:
             target = CHESS_NONE
@@ -439,6 +448,6 @@ class Board(object):
                 cy += dy
 
             if 1 <= cx and cx <= 10 and 1 <=  cy and cy <= 9 and self.get_chess(cx, cy) == target:
-                return False
+                return True
 
         return (x, y) in placable

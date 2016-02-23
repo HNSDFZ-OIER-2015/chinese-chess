@@ -115,4 +115,3 @@ class BlockEnitiy(Enitiy):
     def render(self):
         if self.visible:
             self.window.draw(self.sprite)
-    
