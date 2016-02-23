@@ -14,8 +14,10 @@
     "black_rook": "black-rook.png",
     "black_cannon": "black-cannon.png",
     "black_pawn": "black-pawn.png",
-    "current_select": "current_select.png",
-    "move_select": "move_select.png",
-    "attack_select": "attack_select.png",
-    "selected": "selected.png"
+    "current_select": "current-select.png",
+    "move_select": "move-select.png",
+    "attack_select": "attack-select.png",
+    "selected": "selected.png",
+    "black_win": "black-win.png",
+    "red_win": "red-win.png"
 }

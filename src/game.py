@@ -25,7 +25,9 @@ class Game(object):
             width=resource.config["window_width"],
             height=resource.config["window_height"]
         )
-        self.window.add_handler(CloseEvent, Game.on_close)
+        self.window.add_handler(
+            CloseEvent, Game.on_close, args=(self, )
+        )
         self.window.add_handler(
             MouseMoveEvent, Game.on_mouse_move, args=(self, )
         )
@@ -210,9 +212,13 @@ class Game(object):
             print("(info) Game finished")
 
             if origin == core.CHESS_RED_KING:
+                self.image = Sprite(resource.get("black_win"))
                 print("(info) Black is winner")
             else:
+                self.image = Sprite(resource.get("red_win"))
                 print("(info) Red is winner")
+
+            self.image.position = (0, 0)
 
             self.disabled = True
             self.finished = True
@@ -270,7 +276,7 @@ class Game(object):
 
         self.last_data = None
         self.disabled = False
-        while self.last_data is None:
+        while not self.finished and self.last_data is None:
             time.sleep(0.01)
 
         self.disabled = True
@@ -335,7 +341,8 @@ class Game(object):
     # Event handling #
     ##################
 
-    def on_close(sender, event):
+    def on_close(sender, event, self):
+        self.finished = True
         sender.close()
 
     def on_mouse_move(sender, event, self):
@@ -409,6 +416,10 @@ class Game(object):
         self.current_block.render()
         self.selected_block1.render()
         self.selected_block2.render()
+
+        if self.finished:
+            self.window.draw(self.image)
+
         self.window.present()
 
     def run(self):
