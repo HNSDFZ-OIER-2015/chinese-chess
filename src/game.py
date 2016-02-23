@@ -139,6 +139,14 @@ class Game(object):
                     self.chesses[-1].x = x
                     self.chesses[-1].y = y
 
+    def find_board(self, chess):
+        for i in range(1, 11):
+            for j in range(1, 10):
+                if self.board.get_chess(i, j) == chess:
+                    return i, j
+
+        return None
+
     ##################
     # Event handling #
     ##################
@@ -185,6 +193,17 @@ class Game(object):
 
                 self.update_candidates(i, j)
             else:
+                kx, ky = 0, 0
+
+                if self.board.current == core.CHESS_RED:
+                    kx, ky = self.find_board(core.CHESS_RED_KING)
+                else:
+                    kx, ky = self.find_board(core.CHESS_BLACK_KING)
+
+                if self.board.is_dangerous(kx, ky):
+                    print("Your king is in dangerous")
+                    return
+
                 self.selected_block2.visible = True
                 x, y = self.board_layout.get_position(i, j)
                 self.selected_block2.x = x

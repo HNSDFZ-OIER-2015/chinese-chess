@@ -128,26 +128,209 @@ class RealSearchEngine(PositionSearcher):
             CHESS_RED_PAWN: RealSearchEngine.search_pawn
         }
     
+    def is_out_of_range(self, x, y):
+        return x < 1 or x > 10 or y < 1 or y > 9
+
     def search_king(self, board, x, y):
-        return set()
+        result = set()
+        color = get_chess_color(board.get_chess(x, y))
+
+        up_points = [(1, 4), (1, 5), (1, 6), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5), (3, 6)]
+        down_points = [(8, 4), (8, 5), (8, 6), (9, 4), (9, 5), (9, 6), (10, 4), (10, 5), (10, 6)]
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        points = None
+        if board.layout_name == CHESS_RED:
+            if color == CHESS_RED:
+                points = down_points
+            else:
+                points = up_points
+        else:
+            if color == CHESS_RED:
+                points = up_points
+            else:
+                points = down_points
+
+        for direction in directions:
+            dx, dy = direction
+            p = (x + dx, y + dy)
+
+            if p in points:
+                result.add(p)
+
+        return result
 
     def search_guard(self, board, x, y):
-        return set()
+        result = set()
+        color = get_chess_color(board.get_chess(x, y))
+
+        up_points = [(1, 4), (1, 6), (2, 5), (3, 4), (3, 6)]
+        down_points = [(10, 4), (10, 6), (9, 5), (8, 4), (8, 6)]
+        directions = [(-1, -1), (1, -1), (-1, 1), (1, 1)]
+        points = None
+        if board.layout_name == CHESS_RED:
+            if color == CHESS_RED:
+                points = down_points
+            else:
+                points = up_points
+        else:
+            if color == CHESS_RED:
+                points = up_points
+            else:
+                points = down_points
+
+        for direction in directions:
+            dx, dy = direction
+            p = (x + dx, y + dy)
+
+            if p in points:
+                result.add(p)
+
+        return result
 
     def search_bishop(self, board, x, y):
-        return set()
+        result = set()
+        color = get_chess_color(board.get_chess(x, y))
+
+        up_points = [(1, 3), (1, 7), (3, 1), (3, 5), (3, 9), (5, 3), (5, 7)]
+        down_points = [(6, 3), (6, 7), (8, 1), (8, 5), (8, 9), (10, 3), (10, 7)]
+        directions = [(-2, -2, -1, -1), (2, -2, 1, -1), (-2, 2, -1, 1), (2, 2, 1, 1)]
+        points = None
+        if board.layout_name == CHESS_RED:
+            if color == CHESS_RED:
+                points = down_points
+            else:
+                points = up_points
+        else:
+            if color == CHESS_RED:
+                points = up_points
+            else:
+                points = down_points
+
+        for direction in directions:
+            dx, dy, ix, iy = direction
+            cx, cy = x + ix, y + iy
+
+            if not self.is_out_of_range(cx, cy) and board.get_chess(cx, cy) != CHESS_NONE:
+                continue
+
+            p = (x + dx, y + dy)
+            if p in points:
+                result.add(p)
+
+        return result
 
     def search_knight(self, board, x, y):
-        return set()
+        result = set()
+        color = get_chess_color(board.get_chess(x, y))
+
+        directions = [
+            (-1, -2, 0, -1), (1, -2, 0, -1),
+            (-2, -1, -1, 0), (-2, 1, -1, 0),
+            (-1, 2, 0, 1), (1, 2, 0, 1),
+            (2, -1, 1, 0), (2, 1, 1, 0)
+        ]
+
+        for direction in directions:
+            dx, dy, ix, iy = direction
+            cx, cy = x + ix, y + iy
+
+            if not self.is_out_of_range(cx, cy) and board.get_chess(cx, cy) != CHESS_NONE:
+                continue
+
+            tx, ty = x + dx, y + dy
+            if not self.is_out_of_range(tx, ty):
+                result.add((tx, ty))
+
+        return result
 
     def search_rook(self, board, x, y):
-        return set()
+        result = set()
+        color = get_chess_color(board.get_chess(x, y))
+
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        for direction in directions:
+            dx, dy = direction
+
+            cx, cy = x + dx, y + dy
+            while not self.is_out_of_range(cx, cy) and board.get_chess(cx, cy) == CHESS_NONE:
+                result.add((cx, cy))
+                cx += dx
+                cy += dy
+
+            if not self.is_out_of_range(cx, cy):
+                result.add((cx, cy))
+
+        return result
 
     def search_cannon(self, board, x, y):
-        return set()
+        result = set()
+        color = get_chess_color(board.get_chess(x, y))
+
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        for direction in directions:
+            dx, dy = direction
+
+            cx, cy = x + dx, y + dy
+            while not self.is_out_of_range(cx, cy) and board.get_chess(cx, cy) == CHESS_NONE:
+                result.add((cx, cy))
+                cx += dx
+                cy += dy
+
+            cx += dx
+            cy += dy
+
+            while not self.is_out_of_range(cx, cy) and board.get_chess(cx, cy) == CHESS_NONE:
+                cx += dx
+                cy += dy
+
+            if not self.is_out_of_range(cx, cy):
+                result.add((cx, cy))
+
+        return result
 
     def search_pawn(self, board, x, y):
-        return set()
+        result = set()
+        color = get_chess_color(board.get_chess(x, y))
+
+        up_predirections = [(1, 0)]
+        up_directions = [(1, 0), (0, -1), (0, 1)]
+        up_line = 5
+        down_predirections = [(-1, 0)]
+        down_directions = [(-1, 0), (0, -1), (0, 1)]
+        down_line = 6
+
+        directions = None
+        if board.layout_name == CHESS_RED:
+            if color == CHESS_RED:
+                if x < down_line:
+                    directions = down_directions
+                else:
+                    directions = down_predirections
+            else:
+                if x > up_line:
+                    directions = up_directions
+                else:
+                    directions = up_predirections
+        else:
+            if color == CHESS_RED:
+                if x > up_line:
+                    directions = up_directions
+                else:
+                    directions = up_predirections
+            else:
+                if x < down_line:
+                    directions = down_directions
+                else:
+                    directions = down_predirections
+
+        for direction in directions:
+            dx, dy = direction
+            cx, cy = x + dx, y + dy
+
+            if not self.is_out_of_range(cx, cy):
+                result.add((cx, cy))
+
+        return result
 
     def search(self, board, x, y):
         chess = board.get_chess(x, y)
@@ -159,9 +342,17 @@ class RealSearchEngine(PositionSearcher):
         if color == CHESS_BLACK:
             chess -= 100
 
-        return self.searcher_map[chess](
+        temporary = self.searcher_map[chess](
             self, board, x, y
         )
+
+        result = set()
+        for p in temporary:
+            i, j = p
+            if get_chess_color(board.get_chess(i, j)) != color:
+                result.add(p)
+
+        return result
 
 class Board(object):
     """Respect a board to store game data"""
@@ -208,3 +399,46 @@ class Board(object):
 
     def compute_placable(self, x, y):
         return self.searcher.search(self, x, y)
+
+    def is_dangerous(self, x, y):
+        chess = self.get_chess(x, y)
+        color = get_chess_color(chess)
+        placable = set()
+
+        for i in range(1, 11):
+            for j in range(1, 10):
+                current = self.get_chess(i, j)
+                current_color = get_chess_color(current)
+
+                if current != CHESS_NONE and current_color != color:
+                    placable = placable | self.compute_placable(i, j)
+
+        if chess == CHESS_RED_KING or chess == CHESS_BLACK_KING:
+            target = CHESS_NONE
+            dx = 0
+            dy = 0
+
+            if chess == CHESS_RED_KING:
+                target = CHESS_BLACK_KING
+
+                if self.layout_name == CHESS_RED:
+                    dx = -1
+                else:
+                    dx = 1
+            else:
+                target = CHESS_RED_KING
+
+                if self.layout_name == CHESS_RED:
+                    dx = 1
+                else:
+                    dx = -1
+
+            cx, cy = x + dx, y + dy
+            while 1 <= cx and cx <= 10 and 1 <=  cy and cy <= 9 and self.get_chess(cx, cy) == CHESS_NONE:
+                cx += dx
+                cy += dy
+
+            if 1 <= cx and cx <= 10 and 1 <=  cy and cy <= 9 and self.get_chess(cx, cy) == target:
+                return False
+
+        return (x, y) in placable
