@@ -2,6 +2,10 @@
 # Copyright 2016 HNSDFZ-OIER
 #
 
+import time
+import socket
+import threading
+
 import core
 import graphics
 import resource
@@ -72,6 +76,10 @@ class Game(object):
         self.selected_y = 0
 
         self.disabled = False
+        self.finished = False
+        self.enable_networking = False
+
+        self.last_data = None
 
     def update_current_block(self, x, y):
         indexes = self.board_layout.get_index(
@@ -187,6 +195,12 @@ class Game(object):
         x, y = self.board_layout.get_position(to_x, to_y)
         self.selected_block2.x = x
         self.selected_block2.y = y
+        x, y = self.board_layout.get_position(from_x, from_y)
+        self.selected_block1.x = x
+        self.selected_block1.y = y
+
+        if self.enable_networking:
+            self.last_data = (from_x, from_y, to_x, to_y)
 
         self.board.switch_current()
         self.clear_candidates()
@@ -201,15 +215,37 @@ class Game(object):
                 print("(info) Red is winner")
 
             self.disabled = True
+            self.finished = True
 
     ##################
     # Networking     #
     ##################
 
+    def reverse(self, x, y):
+        return 11 - x, y
+
     def setup_server(self, address, port):
-        pass
+        self.enable_networking = True
+        print("(info) Networking is enabled")
+
+        # Setup
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind((address, port))
+        self.socket.listen(1)
+
+        # Setup thread
+        self.address = address
+        self.port = port
+        self.server_thread = threading.Thread(
+            target=Game.server, args=(self, )
+        )
+        self.server_thread.start()
 
     def setup_client(self, address, port):
+        self.enable_networking = True
+        print("(info) Networking is enabled")
+
+        # Setup
         # Reset chess board layout
         self.board = core.Board(
             resource.config["chess_layout"],
@@ -218,11 +254,82 @@ class Game(object):
         )
         self.scan_board()
 
+        self.disabled = True
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # Setup thread
+        self.address = address
+        self.port = port
+        self.client_thread = threading.Thread(
+            target=Game.client, args=(self, )
+        )
+        self.client_thread.start()
+
+    def wait_for_data(self):
+        print("(info) Waiting for user input")
+
+        self.last_data = None
+        self.disabled = False
+        while self.last_data is None:
+            time.sleep(0.01)
+
+        self.disabled = True
+
+        return self.last_data
+
     def server(self):
-        pass
+        # Wait for connection
+        self.disabled = True
+        self.connection, address = self.socket.accept()
+        print("(info) New connection from %s:%s" % address)
+        self.disabled = False
+
+        try:
+            while not self.finished:
+                data = self.wait_for_data()
+                self.connection.send(("%s %s %s %s" % data).encode("ascii"))
+                print("(info) sent data: (%s, %s, %s, %s)" % data)
+
+                if self.finished:
+                    return
+
+                print("(info) Waiting for remote data")
+                buf = self.connection.recv(1024)
+                fx, fy, tx, ty = map(int, buf.decode("ascii").split(" "))
+                fx, fy = self.reverse(fx, fy)
+                tx, ty = self.reverse(tx, ty)
+                print("(info) received data: (%s, %s, %s, %s)" % (fx, fy, tx, ty))
+
+                self.move(fx, fy, tx, ty)
+        finally:
+            self.connection.close()
+            self.socket.close()
 
     def client(self):
-        pass
+        # Wait for connection
+        self.disabled = True
+        self.socket.connect((self.address, self.port))
+        print("(info) Connected to the server")
+
+        try:
+            while not self.finished:
+                print("(info) Waiting for remote data")
+                buf = self.socket.recv(1024)
+                fx, fy, tx, ty = map(int, buf.decode("ascii").split(" "))
+                fx, fy = self.reverse(fx, fy)
+                tx, ty = self.reverse(tx, ty)
+                print("(info) received data: (%s, %s, %s, %s)" % (fx, fy, tx, ty))
+
+                self.move(fx, fy, tx, ty)
+
+                if self.finished:
+                    return
+
+                data = self.wait_for_data()
+                self.socket.send(("%s %s %s %s" % data).encode("ascii"))
+                print("(info) sent data: (%s, %s, %s, %s)" % data)
+        finally:
+            self.socket.close()
 
     ##################
     # Event handling #

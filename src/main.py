@@ -23,9 +23,9 @@ if len(sys.argv) > 1:
         exit(1)
 
     if command == "create":
-        game.setup_server(address, port)
+        instance.setup_server(address, port)
     elif command == "join":
-        game.setup_client(address, port)
+        instance.setup_client(address, port)
     else:
         print("(error) Unknown command: %s" % command)
         exit(1)

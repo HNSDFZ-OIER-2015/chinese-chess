@@ -127,7 +127,7 @@ class RealSearchEngine(PositionSearcher):
             CHESS_RED_CANNON: RealSearchEngine.search_cannon,
             CHESS_RED_PAWN: RealSearchEngine.search_pawn
         }
-    
+
     def is_out_of_range(self, x, y):
         return x < 1 or x > 10 or y < 1 or y > 9
 
@@ -156,6 +156,34 @@ class RealSearchEngine(PositionSearcher):
 
             if p in points:
                 result.add(p)
+
+        chess = board.get_chess(x, y)
+        target = CHESS_NONE
+        dx = 0
+        dy = 0
+
+        if chess == CHESS_RED_KING:
+            target = CHESS_BLACK_KING
+
+            if board.layout_name == CHESS_RED:
+                dx = -1
+            else:
+                dx = 1
+        else:
+            target = CHESS_RED_KING
+
+            if board.layout_name == CHESS_RED:
+                dx = 1
+            else:
+                dx = -1
+
+        cx, cy = x + dx, y + dy
+        while not self.is_out_of_range(cx, cy) and board.get_chess(cx, cy) == CHESS_NONE:
+            cx += dx
+            cy += dy
+
+        if not self.is_out_of_range(cx, cy) and board.get_chess(cx, cy) == target:
+            result.add((cx, cy))
 
         return result
 
